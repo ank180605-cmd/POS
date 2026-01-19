@@ -16,7 +16,7 @@ export default function App() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
  const mockProducts = [
-  {
+  
       {
     id: 1,
     name: 'Coca Cola lon',
