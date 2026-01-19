@@ -3,39 +3,129 @@ import { ProductGrid } from './components/ProductGrid';
 import { Cart } from './components/Cart';
 import { Header } from './components/Header';
 import { PaymentModal } from './components/PaymentModal';
-import './index.css';
-import { productService } from './services/productService';
 import { Login } from './components/Login';
-import httpAxios from './services/httpAxios';
+import './index.css';
 
 export default function App() {
   const [employee, setEmployee] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('pos_token') || null);
+  const [token, setToken] = useState(localStorage.getItem('pos_token'));
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
-  // Load sản phẩm khi có token
+ const mockProducts = [
+  {
+    id: 1,
+    name: 'Coca Cola lon',
+    price: 12000,
+    stock: 20,
+    active: true,
+    sku: '100001',
+    category: { name: 'Nước giải khát' },
+    image: '/placeholder.png'
+  },
+  {
+    id: 2,
+    name: 'Pepsi lon',
+    price: 12000,
+    stock: 15,
+    active: true,
+    sku: '100002',
+    category: { name: 'Nước giải khát' },
+    image: '/placeholder.png'
+  },
+  {
+    id: 3,
+    name: 'Mì Hảo Hảo tôm chua cay',
+    price: 4500,
+    stock: 0, // ❌ hết hàng
+    active: true,
+    sku: '200001',
+    category: { name: 'Thực phẩm' },
+    image: '/placeholder.png'
+  },
+  {
+    id: 4,
+    name: 'Snack Oishi cay',
+    price: 8000,
+    stock: 12,
+    active: false, // ❌ bị tắt
+    sku: '300001',
+    category: { name: 'Ăn vặt' },
+    image: '/placeholder.png'
+  },
+  {
+    id: 5,
+    name: 'Bánh ChocoPie',
+    price: 25000,
+    stock: 8,
+    active: true,
+    sku: '300002',
+    category: { name: 'Bánh kẹo' },
+    image: '/placeholder.png'
+  },
+  {
+    id: 6,
+    name: 'Nước suối Aquafina',
+    price: 6000,
+    stock: 30,
+    active: true,
+    sku: '100003',
+    category: { name: 'Nước giải khát' },
+    image: '/placeholder.png'
+  },
+  {
+    id: 7,
+    name: 'Cà phê G7 3in1',
+    price: 22000,
+    stock: 5,
+    active: true,
+    sku: '400001',
+    category: { name: 'Đồ uống' },
+    image: '/placeholder.png'
+  },
+  {
+    id: 8,
+    name: 'Trà sữa đóng chai',
+    price: 18000,
+    stock: 0, // ❌ hết hàng
+    active: true,
+    sku: '100004',
+    category: { name: 'Nước giải khát' },
+    image: '/placeholder.png'
+  },
+  {
+    id: 9,
+    name: 'Kẹo bạc hà',
+    price: 5000,
+    stock: 25,
+    active: true,
+    sku: '300003',
+    category: { name: 'Bánh kẹo' },
+    image: '/placeholder.png'
+  },
+  {
+    id: 10,
+    name: 'Sữa tươi Vinamilk',
+    price: 32000,
+    stock: 10,
+    active: true,
+    sku: '500001',
+    category: { name: 'Sữa' },
+    image: '/placeholder.png'
+  }
+];
+
+
+  // ✅ LOAD MOCK SAU KHI LOGIN
   useEffect(() => {
     if (!token) return;
-
-    async function loadProducts() {
-      try {
-        const res = await productService.getAll(token);
-        // API trả về { status, data }
-        console.log('Products API:', res.data);
-        setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-      } catch (err) {
-        console.error('Lỗi load sản phẩm:', err.response || err);
-      }
-    }
-
-    loadProducts();
+    setProducts(mockProducts);
   }, [token]);
 
-  // Nếu chưa login
+  // ✅ LOGIN MOCK
   if (!employee) {
     return (
       <Login
@@ -48,85 +138,60 @@ export default function App() {
     );
   }
 
-  // Tính danh mục
+  // ✅ CATEGORY
   const categories = [
     'all',
-    ...Array.from(new Set(products.map(p => p.category?.name).filter(Boolean))),
+    ...Array.from(new Set(products.map(p => p.category?.name)))
   ];
 
-  // Cart
-const addToCart = (product) => {
-  if (product.stock <= 0) {
-    alert("Sản phẩm đã hết hàng!");
-    return;
-  }
-
-  setCart(prev => {
-    const existing = prev.find(i => i.id === product.id);
-    if (existing) {
-      return prev.map(i =>
-        i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
-      );
+  // ✅ CART LOGIC
+  const addToCart = (product) => {
+    if (product.stock <= 0 || !product.active) {
+      alert('Sản phẩm không khả dụng!');
+      return;
     }
-    return [...prev, { ...product, quantity: 1 }];
-  });
-};
 
-  const removeFromCart = (id) => setCart(prev => prev.filter(i => i.id !== id));
+    setCart(prev => {
+      const exist = prev.find(i => i.id === product.id);
+      if (exist) {
+        return prev.map(i =>
+          i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
+        );
+      }
+      return [...prev, { ...product, quantity: 1 }];
+    });
+  };
+
+  const removeFromCart = id => setCart(prev => prev.filter(i => i.id !== id));
   const updateQuantity = (id, qty) => {
     if (qty <= 0) return removeFromCart(id);
     setCart(prev => prev.map(i => i.id === id ? { ...i, quantity: qty } : i));
   };
   const clearCart = () => setCart([]);
 
-const filteredProducts = products.filter(p => {
-  const q = searchTerm.trim().toLowerCase();
+  // ✅ FILTER
+  const filteredProducts = products.filter(p => {
+    const q = searchTerm.toLowerCase();
+    const matchSearch =
+      !q || p.name.toLowerCase().includes(q) || p.sku.includes(q);
+    const matchCategory =
+      selectedCategory === 'all' || p.category?.name === selectedCategory;
+    return matchSearch && matchCategory;
+  });
 
-  const matchSearch =
-    !q ||
-    p.name.toLowerCase().includes(q) ||
-    (p.sku && p.sku.toString().includes(q));
+  // ✅ BARCODE MOCK
+  const handleBarcodeSearch = (code) => {
+    const product = products.find(p => p.sku === code);
+    if (!product) return alert('Không tìm thấy sản phẩm!');
+    addToCart(product);
+  };
 
-  const matchCategory =
-    selectedCategory === 'all' || p.category?.name === selectedCategory;
-
-  return matchSearch && matchCategory;
-});
-
-
-  const subtotal = cart.reduce((s, it) => s + it.price * it.quantity, 0);
+  const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
   const tax = Math.round(subtotal * 0.1);
   const total = subtotal + tax;
 
-const handleBarcodeSearch = async (code) => {
-  try {
-    const res = await httpAxios.get(`/products/sku/${code}`);
-    const product = res.data.data;
-
-    if (product.stock <= 0) {
-      alert("Sản phẩm đã hết hàng!");
-      return;
-    }
-
-    addToCart(product);
-  } catch (err) {
-    alert("Không tìm thấy sản phẩm!");
-  }
-};
-
-
-
-  const handleCheckout = () => setShowPaymentModal(true);
-  const handlePaymentComplete = () => {
-    clearCart();
-    setShowPaymentModal(false);
-    // TODO: gọi backend tạo order
-  };
-
   return (
     <div className="app-root">
-       <div className="snow-container"></div>
-      
       <Header
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -148,7 +213,10 @@ const handleBarcodeSearch = async (code) => {
             ))}
           </div>
 
-          <ProductGrid products={filteredProducts} onProductClick={addToCart} />
+          <ProductGrid
+            products={filteredProducts}
+            onProductClick={addToCart}
+          />
         </div>
 
         <Cart
@@ -159,7 +227,7 @@ const handleBarcodeSearch = async (code) => {
           subtotal={subtotal}
           tax={tax}
           total={total}
-          onCheckout={handleCheckout}
+          onCheckout={() => setShowPaymentModal(true)}
         />
       </div>
 
@@ -167,13 +235,13 @@ const handleBarcodeSearch = async (code) => {
         <PaymentModal
           total={total}
           items={cart}
-          source="pos"
-          employeeId={employee?.id || null}
           onClose={() => setShowPaymentModal(false)}
-          onComplete={handlePaymentComplete}
+          onComplete={() => {
+            clearCart();
+            setShowPaymentModal(false);
+          }}
         />
       )}
-
     </div>
   );
 }
