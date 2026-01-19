@@ -1,4 +1,3 @@
-import axios from 'axios';
 
 const httpAxios = axios.create({
   baseURL: 'http://localhost:8000/api', // URL backend Laravel
@@ -13,3 +12,4 @@ httpAxios.interceptors.request.use(config => {
 });
 
 export default httpAxios;
+
