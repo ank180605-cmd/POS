@@ -25,7 +25,7 @@ export default function App() {
     active: true,
     sku: '200003',
     category: { name: 'Nước giải khát' },
-   image: '/images/tảixuống(1).jpg'
+   image: '/images/tải xuống (1).jpg'
   },
   {
     id: 2,
@@ -45,7 +45,7 @@ export default function App() {
     active: true,
     sku: '200001',
     category: { name: 'Thực phẩm' },
-    image: '/images/tảixuống.jpg'
+    image: '/images/tải xuống.jpg'
   },
   {
     id: 4,
@@ -55,7 +55,7 @@ export default function App() {
     active: false, // ❌ bị tắt
     sku: '300001',
     category: { name: 'Ăn vặt' },
-    image: '/images/tảixuống(2).jpg'
+    image: '/images/tải xuống (2).jpg'
   },
   {
     id: 5,
@@ -65,7 +65,7 @@ export default function App() {
     active: true,
     sku: '300002',
     category: { name: 'Bánh kẹo' },
-    image: '/images/tảixuống(3).jpg'
+    image: '/images/tải xuống (3).jpg'
   },
   {
     id: 6,
@@ -75,7 +75,7 @@ export default function App() {
     active: true,
     sku: '100003',
     category: { name: 'Nước giải khát' },
-    image: '/images/tảixuống(4).jpg'
+    image: '/images/tải xuống 4).jpg'
   },
   {
     id: 7,
@@ -95,7 +95,7 @@ export default function App() {
     active: true,
     sku: '100004',
     category: { name: 'Nước giải khát' },
-    image: '/images/tảixuống(5).jpg'
+    image: '/images/tải xuống (5).jpg'
   },
   {
     id: 9,
@@ -105,7 +105,7 @@ export default function App() {
     active: true,
     sku: '300003',
     category: { name: 'Bánh kẹo' },
-    image: '/images/tảixuống(6).jpg'
+    image: '/images/tải xuống (6).jpg'
   },
   {
     id: 10,
