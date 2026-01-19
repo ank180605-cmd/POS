@@ -1,26 +1,32 @@
 import React, { useState } from 'react';
-import { authService } from '../services/authService';
 
 export function Login({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
 
-    try {
-      const data = await authService.login(username, password, 'POS-01');
+    // 👉 MOCK LOGIN (KHÔNG GỌI API)
+    if (username === 'admin' && password === '222444') {
+      const mockEmployee = {
+        id: 1,
+        full_name: 'Admin',
+        username: 'admin'
+      };
 
-      localStorage.setItem('pos_token', data.token);
-      // localStorage.setItem('session_id', data.session_id);
+      const mockToken = 'mock-token-123';
 
-      onLogin(data.employee, data.token);
-    } catch (err) {
-      setError(
-        err.response?.data?.message || 'Đăng nhập thất bại'
-      );
+      // lưu giả vào localStorage
+      localStorage.setItem('pos_token', mockToken);
+      localStorage.setItem('employee', JSON.stringify(mockEmployee));
+
+      // gọi callback để vào hệ thống
+      onLogin(mockEmployee, mockToken);
+    } else {
+      setError('Đăng nhập thất bại');
     }
   };
 
@@ -33,14 +39,19 @@ export function Login({ onLogin }) {
 
         <div>
           <label>Username</label>
-          <input value={username} onChange={e => setUsername(e.target.value)} />
+          <input
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+          />
         </div>
 
         <div>
           <label>Password</label>
-          <input type="password"
-                 value={password}
-                 onChange={e => setPassword(e.target.value)} />
+          <input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+          />
         </div>
 
         <button type="submit">Đăng nhập</button>
