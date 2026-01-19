@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Search, Barcode, Store, LogOut } from 'lucide-react';
+import { BrowserMultiFormatReader } from '@zxing/library';
 import { authService } from '../services/authService';
 
 export function Header({
@@ -144,4 +145,3 @@ export function Header({
     </header>
   );
 }
-
