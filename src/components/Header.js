@@ -1,73 +1,17 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Search, Barcode, Store, LogOut } from 'lucide-react';
-import { BrowserMultiFormatReader } from '@zxing/library';
+import React, { useState, useEffect } from 'react';
+import { Search, Store, LogOut } from 'lucide-react';
 import { authService } from '../services/authService';
 
 export function Header({
   searchTerm = '',
-  onSearchChange = () => { },
-  onBarcodeSearch = () => { },
+  onSearchChange = () => {},
+  onBarcodeSearch = () => {},
   employee = null
 }) {
-  const videoRef = useRef(null);
-  const codeReader = useRef(new BrowserMultiFormatReader());
   const [now, setNow] = useState(new Date());
-  const [scanning, setScanning] = useState(false);
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') onBarcodeSearch(searchTerm.trim());
-  };
-
-  const startCameraScan = async () => {
-    setScanning(true);
-    try {
-      codeReader.current.decodeFromVideoDevice(
-        null,
-        videoRef.current,
-        (result) => {
-          if (result) {
-            onBarcodeSearch(result.text);
-            stopCameraScan();
-          }
-        }
-      );
-    } catch (error) {
-      alert('Không thể mở camera!');
-      setScanning(false);
-    }
-  };
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    const container = document.querySelector('.snow-header');
-
-    function createSnowflake() {
-      const snowflake = document.createElement('div');
-      snowflake.classList.add('snowflake');
-      snowflake.style.left = Math.random() * container.offsetWidth + 'px';
-      snowflake.style.fontSize = (8 + Math.random() * 12) + 'px';
-      snowflake.style.animationDuration = (5 + Math.random() * 5) + 's, ' + (3 + Math.random() * 3) + 's';
-      snowflake.style.opacity = Math.random();
-      snowflake.innerText = '❄';
-
-      container.appendChild(snowflake);
-
-      setTimeout(() => snowflake.remove(), 10000);
-    }
-    const interval = setInterval(createSnowflake, 150);
-    return () => clearInterval(interval);
-  }, []);
-
-
-  const stopCameraScan = () => {
-    setScanning(false);
-    codeReader.current.reset();
   };
 
   const handleLogout = async () => {
@@ -86,45 +30,39 @@ export function Header({
     window.location.reload();
   };
 
-
   useEffect(() => {
-    return () => codeReader.current.reset();
+    const timer = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
   }, []);
 
   return (
     <header className="app-header">
       <div className="header-inner">
-        <div className="snow-header"></div>
-
         <div className="top-row">
-
           <div className="brand">
             <Store />
             <div className="brand-sub">KA - Mart</div>
           </div>
 
-          {/* THÔNG TIN NHÂN VIÊN */}
           <div className="time-info">
             <div>
-              <strong>Thu ngân:</strong> {employee ? employee.full_name : 'Chưa đăng nhập'}
+              <strong>Thu ngân:</strong>{' '}
+              {employee ? employee.full_name : 'Chưa đăng nhập'}
             </div>
             <div>
-              {now.toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })} -{' '}
-              {now.toLocaleTimeString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}
+              {now.toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}{' '}
+              - {now.toLocaleTimeString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}
             </div>
             {employee && (
               <button className="btn-logout" onClick={handleLogout}>
-                <LogOut size={16} />
-                Đăng xuất
+                <LogOut size={16} /> Đăng xuất
               </button>
             )}
           </div>
-
-          {/* CAMERA */}
-          <video ref={videoRef} className="header-video" autoPlay playsInline muted />
         </div>
 
-        {/* SEARCH */}
         <div className="search-area">
           <div className="search-box">
             <Search className="icon" />
@@ -132,14 +70,9 @@ export function Header({
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Tìm kiếm sản phẩm hoặc nhập mã vạch..."
+              placeholder="Tìm kiếm sản phẩm hoặc nhập mã sản phẩm..."
             />
           </div>
-
-          <button className="btn-scan" onClick={scanning ? stopCameraScan : startCameraScan}>
-            <Barcode />
-            {scanning ? 'Đang quét...' : 'Quét mã'}
-          </button>
         </div>
       </div>
     </header>
